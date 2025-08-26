@@ -1,6 +1,21 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
+import { Controller, Get } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+
+@Controller('debug')
+class DebugController {
+	constructor(private cfg: ConfigService) {}
+	@Get('env') env() {
+		return {
+			nodeEnv: process.env.NODE_ENV,
+			frontendOriginEnvVar: process.env.FRONTEND_ORIGIN,
+			configModuleValue: this.cfg.get('FRONTEND_ORIGIN'),
+			loadedAt: new Date().toISOString(),
+		};
+	}
+}
 import { AppService } from './app.service';
 import { CommonModule } from './common/common.module';
 import { AuthModule } from './auth/auth.module';
@@ -29,7 +44,7 @@ import { QueueModule } from './queue/queue.module';
 		PdfModule,
 		QueueModule,
 	],
-	controllers: [AppController],
+	controllers: [AppController, DebugController],
 	providers: [AppService],
 })
 export class AppModule {}

@@ -7,11 +7,16 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  // Flexible CORS: FRONTEND_ORIGIN may be a comma separated list of exact origins.
+  // Example: FRONTEND_ORIGIN="http://localhost:5173,https://chronocap.netlify.app"
+  const rawOrigins = process.env.FRONTEND_ORIGIN || 'http://localhost:5173';
+  const allowedOrigins = rawOrigins.split(',').map(o => o.trim().replace(/\/$/, '')).filter(Boolean);
+  console.log('[CORS] Allowed origins:', allowedOrigins);
   app.enableCors({
-    origin: process.env.FRONTEND_ORIGIN?.split(',') || ['http://localhost:5173'],
+    origin: allowedOrigins,
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    allowedHeaders: 'Content-Type, Authorization',
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'ngrok-skip-browser-warning'],
   });
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,

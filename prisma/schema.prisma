@@ -15,6 +15,8 @@ model User {
   name         String?
   refreshToken String?   @unique
   capsules     Capsule[]
+  emailVerifiedAt DateTime?
+  mailLogs     MailLog[]
 }
 
 model Capsule {
@@ -28,4 +30,33 @@ model Capsule {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum MailType {
+  EMAIL_VERIFICATION
+}
+
+enum MailStatus {
+  PENDING
+  SENT
+  RECEIVED
+  DELIVERED
+  FAILED
+  CONFIRMED
+}
+
+model MailLog {
+  id               Int        @id @default(autoincrement())
+  userId           Int
+  type             MailType
+  status           MailStatus @default(PENDING)
+  providerMessageId String?   @unique
+  token            String?    @unique
+  attempts         Int        @default(0)
+  lastError        String?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  user             User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId, type])
+  @@index([status])
 }

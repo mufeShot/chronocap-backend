@@ -5,10 +5,12 @@ import { AuthService } from './auth.service';
 import { UsersModule } from '../users/users.module';
 import { JwtStrategy } from './jwt.strategy';
 import { JwtAuthGuard } from './jwt.guard';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   imports: [
-    UsersModule,
+  UsersModule,
+  MailModule,
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET,
